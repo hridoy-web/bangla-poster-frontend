@@ -3,6 +3,7 @@ import { Hind_Siliguri, Lexend } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const englishFont = Lexend({
   variable: "--font-lexend",
@@ -75,7 +76,7 @@ export default function RootLayout({
         </main>
 
         <Footer />
-        
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

@@ -1,26 +1,27 @@
-
+import MobileMenu from "./MobileMenu";
 import NavLinks from "./NavLinks";
 import UserMenu from "./UserMenu";
-import MobileMenu from "./MobileMenu";
 import Logo from "../shared/Logo";
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/80 backdrop-blur-md">
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/85 backdrop-blur-md overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Left Side: Mobile Menu + Logo */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 min-w-0">
           <MobileMenu />
-          <Logo />
+          <div className="truncate">
+            <Logo />
+          </div>
         </div>
 
-        {/* Middle: Desktop Nav Links */}
-        <NavLinks />
+        <div className="hidden md:block">
+          <NavLinks />
+        </div>
 
-        {/* Right Side: User Menu / Auth Buttons */}
-        <UserMenu />
+        <div className="flex items-center shrink-0">
+          <UserMenu />
+        </div>
 
       </div>
     </header>
