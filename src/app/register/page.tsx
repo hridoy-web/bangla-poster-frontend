@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { registerService } from '@/lib/services/authService';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
+
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
@@ -29,9 +32,11 @@ export default function RegisterPage() {
     try {
       const response = await registerService(formData);
       toast.success(response.message || 'Account created successfully!');
-      
+
+      const destination = redirectTo ? decodeURIComponent(redirectTo) : '/';
+
       setTimeout(() => {
-        router.push('/');
+        router.push(destination);
       }, 1000);
       
     } catch (error: unknown) {
@@ -44,7 +49,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-card border border-border p-8 rounded-3xl shadow-2xl">
+      <div className="max-w-md w-full space-y-8 bg-card border border-border/60 p-8 rounded-3xl shadow-2xl backdrop-blur-sm">
         
         <div className="text-center">
           <h2 className="text-3xl font-extrabold tracking-tight">
@@ -66,7 +71,7 @@ export default function RegisterPage() {
                 placeholder="Enter your name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                className="w-full bg-input border border-border/80 rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-primary transition-all text-sm"
               />
             </div>
 
@@ -79,7 +84,7 @@ export default function RegisterPage() {
                 placeholder="example@gmail.com or mobile number"
                 value={formData.emailOrPhone}
                 onChange={handleChange}
-                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                className="w-full bg-input border border-border/80 rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-primary transition-all text-sm"
               />
             </div>
 
@@ -93,7 +98,7 @@ export default function RegisterPage() {
                   placeholder="At least 6 characters"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full bg-input border border-border rounded-xl px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  className="w-full bg-input border border-border/80 rounded-xl px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-primary transition-all text-sm"
                 />
                 <button
                   type="button"
@@ -110,15 +115,24 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-btn font-extrabold py-3.5 px-4 rounded-xl shadow-lg hover:opacity-95 transition-opacity disabled:opacity-50 text-center cursor-pointer"
+              className="w-full bg-gradient-btn font-extrabold py-3.5 px-4 rounded-xl shadow-lg hover:opacity-95 transition-opacity disabled:opacity-50 text-center cursor-pointer border-0 text-white flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating Account...' : 'Register'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Creating Account...
+                </>
+              ) : (
+                'Register'
+              )}
             </button>
           </div>
 
           <div className="text-center text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-primary hover:underline">
+            <Link 
+              href={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : '/login'} 
+              className="font-semibold text-primary hover:underline"
+            >
               Login
             </Link>
           </div>
@@ -126,5 +140,13 @@ export default function RegisterPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

@@ -16,21 +16,10 @@ import { logoutService } from "@/lib/services/authService";
 
 export default function UserMenu() {
   const router = useRouter();
-  const [mounted] = useState(true);
-  
-  const [user, setUser] = useState<{ name: string; emailOrPhone: string } | null>(() => {
-    if (typeof window === "undefined") return null;
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) return null;
-    try {
-      return JSON.parse(storedUser);
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState<{ name: string; emailOrPhone: string } | null>(null);
 
   useEffect(() => {
-    const handleAuthChange = () => {
+    const loadUser = () => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         try {
@@ -43,9 +32,11 @@ export default function UserMenu() {
       }
     };
 
-    window.addEventListener("auth-change", handleAuthChange);
+    loadUser();
+
+    window.addEventListener("auth-change", loadUser);
     return () => {
-      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener("auth-change", loadUser);
     };
   }, []);
 
@@ -58,10 +49,6 @@ export default function UserMenu() {
     setUser(null);
     router.push("/login");
   };
-
-  if (!mounted) {
-    return <div className="h-10 w-24" />;
-  }
 
   return (
     <div className="flex items-center">
